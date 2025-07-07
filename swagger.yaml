@@ -4,267 +4,39 @@ info:
   version: "1.0.0"
   description: |
     Interactive documentation for the LuxeStore backend.
-
 servers:
   - url: https://luxxestore.onrender.com
     description: Production server
-
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
-paths:
-  /api/auth/register:
-    post:
-      summary: Register a new user
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [email, password, name]
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
-                name:
-                  type: string
-      responses:
-        "201":
-          description: User created
-
-  /api/auth/login:
-    post:
-      summary: Authenticate user
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [email, password]
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
-      responses:
-        "200":
-          description: JWT token
-
-  /api/auth/logout:
-    post:
-      summary: Logout user
-      security:
-        - BearerAuth: []
-      responses:
-        "204":
-          description: Logged out
-
-  /api/products:
-    get:
-      summary: List all products
-      responses:
-        "200":
-          description: Array of products
-    post:
-      summary: Create a product (Admin only)
-      security:
-        - BearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Product'
-      responses:
-        "201":
-          description: Created
-
-  /api/products/{id}:
-    parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-    get:
-      summary: Get product by ID
-      responses:
-        "200":
-          description: A product
-    put:
-      summary: Update product (Admin only)
-      security:
-        - BearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Product'
-      responses:
-        "200":
-          description: Updated
-    delete:
-      summary: Delete product (Admin only)
-      security:
-        - BearerAuth: []
-      responses:
-        "204":
-          description: Deleted
-
-  /api/orders:
-    post:
-      summary: Create order (Authenticated)
-      security:
-        - BearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Order'
-      responses:
-        "201":
-          description: Created
-    get:
-      summary: List all orders (Admin only)
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Array of orders
-
-  /api/orders/{id}:
-    parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-    get:
-      summary: Get order by ID (Owner/Admin)
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Order details
-
-  /api/orders/user/{userId}:
-    parameters:
-      - in: path
-        name: userId
-        schema:
-          type: string
-        required: true
-    get:
-      summary: Get orders for a user (Owner/Admin)
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Array of orders
-
-  /api/cart:
-    post:
-      summary: Add to cart (Authenticated)
-      security:
-        - BearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                items:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/CartItem'
-      responses:
-        "200":
-          description: Cart updated
-
-  /api/checkout:
-    post:
-      summary: Create a payment intent
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [amount]
-              properties:
-                amount:
-                  type: number
-                currency:
-                  type: string
-                metadata:
-                  type: object
-      responses:
-        "200":
-          description: Payment intent created
-
-  /api/reviews:
-    post:
-      summary: Create review (Authenticated)
-      security:
-        - BearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [productId, rating]
-              properties:
-                productId:
-                  type: string
-                rating:
-                  type: integer
-                  minimum: 1
-                  maximum: 5
-                comment:
-                  type: string
-      responses:
-        "201":
-          description: Created
-  /api/reviews/{productId}:
-    get:
-      summary: List reviews for a product
-      parameters:
-        - in: path
-          name: productId
-          schema:
-            type: string
-          required: true
-      responses:
-        "200":
-          description: Array of reviews
-
-  /api/upload/imgbb:
-    post:
-      summary: Upload image to imgbb (Authenticated)
-      security:
-        - BearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [base64Image]
-              properties:
-                base64Image:
-                  type: string
-      responses:
-        "200":
-          description: Image URL returned
-
-components:
   schemas:
+    UserCredentials:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    UserRegistration:
+      type: object
+      required:
+        - email
+        - password
+        - name
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
     Product:
       type: object
       properties:
@@ -288,21 +60,6 @@ components:
           type: integer
         category:
           type: string
-
-    Order:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderItem'
-        amount:
-          type: number
-        status:
-          type: string
-        paymentIntentId:
-          type: string
-
     OrderItem:
       type: object
       properties:
@@ -314,11 +71,255 @@ components:
           type: number
         quantity:
           type: integer
-
-    CartItem:
+    Order:
       type: object
+      required:
+        - items
+        - amount
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        amount:
+          type: number
+        status:
+          type: string
+        paymentIntentId:
+          type: string
+    Cart:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+    Review:
+      type: object
+      required:
+        - productId
+        - rating
       properties:
         productId:
           type: string
-        quantity:
+        rating:
           type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+    ImageUpload:
+      type: object
+      required:
+        - base64Image
+      properties:
+        base64Image:
+          type: string
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        "201":
+          description: User registered successfully
+  /api/auth/login:
+    post:
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        "200":
+          description: User authenticated, JWT returned
+  /api/auth/logout:
+    post:
+      summary: Logout user
+      security:
+        - BearerAuth: []
+      responses:
+        "204":
+          description: User logged out
+  /api/products:
+    get:
+      summary: Get all products
+      responses:
+        "200":
+          description: List of products
+    post:
+      summary: Create a new product (Admin only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        "201":
+          description: Product created
+  /api/products/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get product by ID
+      responses:
+        "200":
+          description: Product details
+    put:
+      summary: Update product (Admin only)
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        "200":
+          description: Product updated
+    delete:
+      summary: Delete product (Admin only)
+      security:
+        - BearerAuth: []
+      responses:
+        "204":
+          description: Product deleted
+  /api/orders:
+    post:
+      summary: Create a new order (Authenticated)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        "201":
+          description: Order created
+    get:
+      summary: Get all orders (Admin only)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of orders
+  /api/orders/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get order by ID (Owner or Admin)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Order details
+  /api/orders/user/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get orders for a user (Owner or Admin)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of user orders
+  /api/cart:
+    post:
+      summary: Add items to cart (Authenticated)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cart'
+      responses:
+        "200":
+          description: Cart updated
+  /api/checkout:
+    post:
+      summary: Create a payment intent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                currency:
+                  type: string
+                  default: usd
+                metadata:
+                  type: object
+      responses:
+        "200":
+          description: Payment intent created
+  /api/reviews:
+    post:
+      summary: Create a review (Authenticated)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        "201":
+          description: Review created
+  /api/reviews/{productId}:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get all reviews for a product
+      responses:
+        "200":
+          description: List of reviews
+  /api/upload/imgbb:
+    post:
+      summary: Upload image to imgbb (Authenticated)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageUpload'
+      responses:
+        "200":
+          description: Image uploaded

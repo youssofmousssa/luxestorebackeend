@@ -8,7 +8,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
-  "author": "",
+  "author": "Youssof Moussa",
   "license": "MIT",
   "dependencies": {
     "@stripe/stripe-js": "^7.4.0",
@@ -22,6 +22,7 @@
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
     "stripe": "^18.3.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "swapper-docs": "github:swapper-project/swapper-docs"
   }
 }

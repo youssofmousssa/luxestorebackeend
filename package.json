@@ -18,11 +18,11 @@
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "marked": "^16.0.0",
     "node-fetch": "^3.3.2",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
     "stripe": "^18.3.0",
-    "uuid": "^11.1.0",
-    "swapper-docs": "https://github.com/swapper-project/swapper-docs.git"
+    "uuid": "^11.1.0"
   }
 }

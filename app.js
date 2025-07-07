@@ -1,17 +1,21 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import dotenv from 'dotenv';
-import fs from 'fs';
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
+import authRoutes from "./routes/authRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 
-import authRoutes from './routes/authRoutes.js';
-import productRoutes from './routes/productRoutes.js';
-import orderRoutes from './routes/orderRoutes.js';
-import reviewRoutes from './routes/reviewRoutes.js';
-import uploadRoutes from './routes/uploadRoutes.js';
+import { errorHandler } from "./middlewares/errorMiddleware.js";
 
-import { errorHandler } from './middlewares/errorMiddleware.js';
+import { marked } from "marked";
 
 dotenv.config();
 
@@ -19,20 +23,20 @@ const app = express();
 
 app.use(helmet());
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: "10mb" }));
+
+// Fix __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Serve interactive API docs at /docs
-import { marked } from 'marked';
-
-app.get('/docs', (req, res) => {
-  const fs = require('fs');
-  const path = require('path');
-  const mdPath = path.join(__dirname, 'docs.md');
-  let markdown = '';
+app.get("/docs", (req, res) => {
+  const mdPath = path.join(__dirname, "docs.md");
+  let markdown = "";
   try {
-    markdown = fs.readFileSync(mdPath, 'utf-8');
+    markdown = fs.readFileSync(mdPath, "utf-8");
   } catch (e) {
-    markdown = '# Documentation Not Found';
+    markdown = "# Documentation Not Found";
   }
   const html = marked.parse(markdown);
   res.send(`
@@ -104,19 +108,19 @@ app.get('/docs', (req, res) => {
   `);
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/upload', uploadRoutes);
+// API routes
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/upload", uploadRoutes);
 
-// Health check
-app.get('/api/ping', (req, res) => {
-  res.json({ message: 'LuxeStore API running on SQLite' });
+// Health check endpoint
+app.get("/api/ping", (req, res) => {
+  res.json({ message: "LuxeStore API running on SQLite" });
 });
 
-// Error handler
+// Error handler middleware
 app.use(errorHandler);
 
 export default app;
